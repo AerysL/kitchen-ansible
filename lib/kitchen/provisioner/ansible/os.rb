@@ -27,6 +27,7 @@ require 'kitchen/provisioner/ansible/os/darwin'
 require 'kitchen/provisioner/ansible/os/alpine'
 require 'kitchen/provisioner/ansible/os/openbsd'
 require 'kitchen/provisioner/ansible/os/freebsd'
+require 'kitchen/provisioner/ansible/os/archlinux'
 
 module Kitchen
   module Provisioner
@@ -61,6 +62,8 @@ module Kitchen
             return Openbsd.new(platform, config)
           when 'freebsd'
             return Freebsd.new(platform, config)
+          when 'archlinux'
+            return ArchLinux.new(platform, config)
           end
 
           nil

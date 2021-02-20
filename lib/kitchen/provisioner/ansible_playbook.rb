@@ -104,6 +104,8 @@ module Kitchen
                 #{Kitchen::Provisioner::Ansible::Os::Openbsd.new('openbsd', config).install_command}
               elif [ $(uname -s) = "FreeBSD" ]; then
                 #{Kitchen::Provisioner::Ansible::Os::Freebsd.new('freebsd', config).install_command}
+              elif [ -f /etc/arch-release ]; then
+                #{Kitchen::Provisioner::Ansible::Os::ArchLinux.new('archlinux', config).install_command}
               else
                 #{Kitchen::Provisioner::Ansible::Os::Debian.new('debian', config).install_command}
               fi
@@ -201,6 +203,9 @@ module Kitchen
             elif [ -f /etc/alpine-release ]  || [ -d /etc/apk ]; then
                 #{update_packages_alpine_cmd}
                 #{sudo_env('apk')} add ruby ruby-dev ruby-io-console ca-certificates > #{detect_debug}
+            elif [ -f /etc/arch-release ]; then
+                #{update_packages_archlinux_cmd}
+                #{sudo_env('pacman')} --noconfirm ruby gcc
             else
               if [ ! $(which ruby) ]; then
                 #{update_packages_debian_cmd}

@@ -40,7 +40,8 @@ describe Kitchen::Provisioner::Ansible::Os do
       ['suse', Kitchen::Provisioner::Ansible::Os::Suse],
       ['alpine', Kitchen::Provisioner::Ansible::Os::Alpine],
       ['openbsd', Kitchen::Provisioner::Ansible::Os::Openbsd],
-      ['freebsd', Kitchen::Provisioner::Ansible::Os::Freebsd]
+      ['freebsd', Kitchen::Provisioner::Ansible::Os::Freebsd],
+      ['archlinux', Kitchen::Provisioner::Ansible::Os::ArchLinux]
     ].each do |item|
       it "return the correct class for '#{item[0]}'" do
         c = Kitchen::Provisioner::Ansible::Os.make(item[0], [])
