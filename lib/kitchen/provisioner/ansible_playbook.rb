@@ -205,7 +205,7 @@ module Kitchen
                 #{sudo_env('apk')} add ruby ruby-dev ruby-io-console ca-certificates > #{detect_debug}
             elif [ -f /etc/arch-release ]; then
                 #{update_packages_archlinux_cmd}
-                #{sudo_env('pacman')} --noconfirm ruby gcc
+                #{sudo_env('pacman')} --noconfirm -S --needed ruby gcc base-devel git ruby-bundler
             else
               if [ ! $(which ruby) ]; then
                 #{update_packages_debian_cmd}
@@ -247,10 +247,24 @@ module Kitchen
             # install chef omnibus so that busser works as this is needed to run tests :(
             if [ ! -d "/opt/chef" ]
             then
-              echo "-----> Installing Chef Omnibus to install busser to run tests"
-              #{export_http_proxy}
-              do_download #{chef_url} /tmp/install.sh
-              #{sudo_env('sh')} /tmp/install.sh > #{detect_debug}
+            if [ -f /etc/arch-release ]; then
+                echo "Arch linux, installing Chef  from AUR"
+                #{update_packages_archlinux_cmd}
+                #{sudo_env('pacman')} -S --noconfirm --needed base-devel
+                curl https://aur.archlinux.org/cgit/aur.git/snapshot/trizen.tar.gz > trizen.tar.gz
+                tar -xzvf trizen.tar.gz
+                cd trizen
+                makepkg -d --noconfirm
+                makepkg -i --noconfirm
+                cd ..
+                mkdir tmp
+                trizen -S --needed chef-workstation --noconfirm --clone_dir=tmp
+              else
+                echo "-----> Installing Chef Omnibus to install busser to run tests"
+                #{export_http_proxy}
+                do_download #{chef_url} /tmp/install.sh
+                #{sudo_env('sh')} /tmp/install.sh > #{detect_debug}
+              fi
             fi
             INSTALL
         end
@@ -872,6 +886,10 @@ module Kitchen
 
       def update_packages_alpine_cmd
         Kitchen::Provisioner::Ansible::Os::Alpine.new('alpine', config).update_packages_command
+      end
+
+      def update_packages_archlinux_cmd
+        Kitchen::Provisioner::Ansible::Os::ArchLinux.new('archlinux', config).update_packages_command
       end
 
       def python_sles_repo
